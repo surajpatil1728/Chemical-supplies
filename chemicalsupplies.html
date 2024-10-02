@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemical List</title>
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+.container {
+    width: 80%;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+}
+
+.toolbar {
+    margin-bottom: 10px;
+}
+
+button {
+    margin: 5px;
+    padding: 5px 10px;
+    background-color: #FFFFFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+input {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ccc;
+}
+</style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Chemical supplies</h1>
+
+
+<div class="toolbar">
+    <button id="addRowBtn" title="Add Row">➕</button>
+    <button id="moveUpBtn" title="Move Up">⬆️</button>
+    <button id="moveDownBtn" title="Move Down">⬇️</button>
+    <button id="deleteRowBtn" title="Delete Row">🗑️</button>
+    <button id="refreshBtn" title="Refresh">🔄</button>
+    <button id="saveBtn" title="Save">💾</button>
+</div>
+
+</table>
+        <!-- Table for chemical data -->
+        <table id="chemicalTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">ID</th>
+                    <th onclick="sortTable(1)">Chemical Name</th>
+                    <th onclick="sortTable(2)">Vendor</th>
+                    <th onclick="sortTable(3)">Density g/m³</th>
+                    <th onclick="sortTable(4)">Viscosity m²/s </th>
+                    <th onclick="sortTable(5)">Packaging</th>
+                    <th onclick="sortTable(6)">Pack Size</th>
+                    <th onclick="sortTable(7)">Unit</th>
+                    <th onclick="sortTable(8)">Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+<script>
+let chemicalData = [
+    { id: 1, chemical_name: "Ammonium Persulfate", vendor: "LG Chem", density: "3525.92", viscosity: "60.63", packaging: "Bag", pack_size: "100.00 ", unit: "kg", quantity: 6495.18 },
+
+    { id: 2, chemical_name: "Caustic Potash", vendor: "Formosa", density: "3172.15", viscosity: "48.22", packaging: "Bag", pack_size: "100", unit: "kg", quantity: 8751.90 },
+
+    { id: 3, chemical_name: "Dimethylaminopropylamino", vendor: "LG Chem", density: "8435.37", viscosity: "12.62", packaging: "Barrel", pack_size: "75.00", unit: "L", quantity: 5964.61 },
+
+    { id: 4, chemical_name: "Mono Ammonium Phosphate", vendor: "Sinopec", density: "1597.65", viscosity: "76.51", packaging: "Bag", pack_size: "105.00", unit: "kg", quantity: 4154.33 },
+
+    { id: 5, chemical_name: "Ferric Nitrate", vendor: "DowDuPont", density: "364.04", viscosity: "14.90", packaging: "Bag", pack_size: "105.00", unit: "kg", quantity: 8751.90 },
+
+    { id: 6, chemical_name: "n-Pentane", vendor: "Sinopec", density: "4535.26", viscosity: "66.76", packaging: "N/A", pack_size: "N/A", unit: "t", quantity: 6272.34 },
+];
+
+let selectedRowIndex = -1;
+
+
+function renderTable() {
+    const tableBody = document.getElementById("tableBody");
+    tableBody.innerHTML = "";  
+
+    chemicalData.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${row.id}</td>
+            <td contenteditable="true">${row.chemical_name}</td>
+            <td contenteditable="true">${row.vendor}</td>
+            <td contenteditable="true">${row.density}</td>
+            <td contenteditable="true">${row.viscosity}</td>
+            <td contenteditable="true">${row.packaging}</td>
+            <td contenteditable="true">${row.pack_size}</td>
+            <td contenteditable="true">${row.unit}</td>
+            <td contenteditable="true">${row.quantity}</td>
+        `;
+        tr.addEventListener('click', () => selectRow(index));
+        tableBody.appendChild(tr);
+    });
+}
+
+
+renderTable();
+
+
+function sortTable(columnIndex) {
+    const isAscending = this.isAscending !== undefined ? !this.isAscending : true;
+    this.isAscending = isAscending;
+
+    chemicalData.sort((a, b) => {
+        const valA = Object.values(a)[columnIndex];
+        const valB = Object.values(b)[columnIndex];
+        if (isAscending) {
+            return valA > valB ? 1 : -1;
+        } else {
+            return valA < valB ? 1 : -1;
+        }
+    });
+
+    renderTable();  
+}
+
+
+// Select a row
+function selectRow(index) {
+    selectedRowIndex = index;
+    const rows = document.querySelectorAll('#tableBody tr');
+    rows.forEach((row, i) => {
+        row.style.backgroundColor = (i === index) ? '#d1e7dd' : '';
+    });
+}
+
+// Add a new row
+document.getElementById('addRowBtn').addEventListener('click', () => {
+    const newRow = { id: chemicalData.length + 1, chemical_name: '', vendor: '', density: '', viscosity: '', packaging: '', pack_size: '', unit: '', quantity: 0 };
+    chemicalData.push(newRow);
+    renderTable();
+});
+
+// Delete selected row
+document.getElementById('deleteRowBtn').addEventListener('click', () => {
+    if (selectedRowIndex >= 0) {
+        chemicalData.splice(selectedRowIndex, 1);
+        selectedRowIndex = -1;  // Reset selection
+        renderTable();
+    }
+});
+
+// Move row up
+document.getElementById('moveUpBtn').addEventListener('click', () => {
+    if (selectedRowIndex > 0) {
+        [chemicalData[selectedRowIndex - 1], chemicalData[selectedRowIndex]] = [chemicalData[selectedRowIndex], chemicalData[selectedRowIndex - 1]];
+        selectedRowIndex--;
+        renderTable();
+    }
+});
+
+// Move row down
+document.getElementById('moveDownBtn').addEventListener('click', () => {
+    if (selectedRowIndex < chemicalData.length - 1) {
+        [chemicalData[selectedRowIndex], chemicalData[selectedRowIndex + 1]] = [chemicalData[selectedRowIndex + 1], chemicalData[selectedRowIndex]];
+        selectedRowIndex++;
+        renderTable();
+    }
+});
+
+// Refresh table
+document.getElementById('refreshBtn').addEventListener('click', () => {
+    renderTable();  // Re-render the table
+});
+
+// Save data
+document.getElementById('saveBtn').addEventListener('click', () => {
+    alert('Data saved! (In a real-world scenario, this would send data to the server.)');
+});
+
+</script>
